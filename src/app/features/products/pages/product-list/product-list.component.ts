@@ -20,6 +20,7 @@ export class ProductListComponent implements OnInit {
   products = signal<Product[]>([]);
   searchTerm = signal<string>('');
   pageSize = signal<number>(5);
+  currentPage = signal<number>(1);
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
 
@@ -33,19 +34,33 @@ export class ProductListComponent implements OnInit {
 
     if (!term) return allProducts;
 
-    return allProducts.filter(product =>
-      product.name.toLowerCase().includes(term) ||
-      product.description.toLowerCase().includes(term)
+    return allProducts.filter(
+      (product) =>
+        product.name.toLowerCase().includes(term) ||
+        product.description.toLowerCase().includes(term),
     );
   });
 
+  // Computed: total de resultados
+  totalResults = computed(() => this.filteredProducts().length);
+
+  // Computed: total de páginas
+  totalPages = computed(() =>
+    Math.ceil(this.filteredProducts().length / this.pageSize())
+  );
+
   // Computed: productos paginados
   paginatedProducts = computed(() => {
-    return this.filteredProducts().slice(0, this.pageSize());
+    const start = (this.currentPage() - 1) * this.pageSize();
+    const end = start + this.pageSize();
+    return this.filteredProducts().slice(start, end);
   });
 
-  // Computed: total de resultados mostrados
-  resultsCount = computed(() => this.paginatedProducts().length);
+  // Computed: ¿puede ir a página anterior?
+  canGoPrevious = computed(() => this.currentPage() > 1);
+
+  // Computed: ¿puede ir a página siguiente?
+  canGoNext = computed(() => this.currentPage() < this.totalPages());
 
   ngOnInit(): void {
     this.loadProducts();
@@ -64,18 +79,38 @@ export class ProductListComponent implements OnInit {
         this.error.set('Error al cargar los productos. Intente nuevamente.');
         this.isLoading.set(false);
         console.error('Error loading products:', err);
-      }
+      },
     });
   }
 
   onSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.searchTerm.set(input.value);
+    this.currentPage.set(1);
   }
 
   onPageSizeChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
     this.pageSize.set(Number(select.value));
+    this.currentPage.set(1);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  previousPage(): void {
+    if (this.canGoPrevious()) {
+      this.currentPage.update(p => p - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.canGoNext()) {
+      this.currentPage.update(p => p + 1);
+    }
   }
 
   navigateToCreate(): void {
@@ -110,7 +145,7 @@ export class ProductListComponent implements OnInit {
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
 }

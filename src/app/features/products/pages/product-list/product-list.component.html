@@ -8,9 +8,7 @@
       [value]="searchTerm()"
       (input)="onSearch($event)"
     />
-    <button class="btn-add" (click)="navigateToCreate()">
-      Agregar
-    </button>
+    <button class="btn-add" (click)="navigateToCreate()">Agregar</button>
   </div>
 
   <!-- Error Message -->
@@ -70,7 +68,7 @@
                     <img
                       [src]="product.logo"
                       [alt]="product.name"
-                      (error)="$event.target.style.display='none'"
+                      (error)="$event.target.style.display = 'none'"
                     />
                   }
                   <span class="logo-fallback">
@@ -100,9 +98,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="6" class="empty-state">
-                No se encontraron productos
-              </td>
+              <td colspan="6" class="empty-state">No se encontraron productos</td>
             </tr>
           }
         </tbody>
@@ -111,12 +107,32 @@
 
     <!-- Footer: Results count + Page size selector -->
     <div class="table-footer">
-      <span class="results-count">{{ resultsCount() }} Resultados</span>
-      <select
-        class="page-size-select"
-        [value]="pageSize()"
-        (change)="onPageSizeChange($event)"
-      >
+      <span class="results-count">{{ totalResults() }} Resultados</span>
+
+      <!-- Paginación -->
+      @if (totalPages() > 1) {
+        <div class="pagination">
+          <button class="pagination-btn" [disabled]="!canGoPrevious()" (click)="previousPage()">
+            &lt;
+          </button>
+
+          @for (page of [].constructor(totalPages()); track $index) {
+            <button
+              class="pagination-btn"
+              [class.active]="currentPage() === $index + 1"
+              (click)="goToPage($index + 1)"
+            >
+              {{ $index + 1 }}
+            </button>
+          }
+
+          <button class="pagination-btn" [disabled]="!canGoNext()" (click)="nextPage()">
+            &gt;
+          </button>
+        </div>
+      }
+
+      <select class="page-size-select" [value]="pageSize()" (change)="onPageSizeChange($event)">
         <option value="5">5</option>
         <option value="10">10</option>
         <option value="20">20</option>
