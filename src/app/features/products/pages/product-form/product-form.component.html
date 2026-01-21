@@ -1,0 +1,119 @@
+<div class="form-container">
+  <div class="form-card">
+    <h1 class="form-title">
+      {{ isEditMode() ? 'Formulario de Edición' : 'Formulario de Registro' }}
+    </h1>
+
+    <hr class="form-divider" />
+
+    @if (isLoading()) {
+      <div class="loading-form">
+        <p>Cargando producto...</p>
+      </div>
+    } @else {
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- ID -->
+          <div class="form-group">
+            <label for="id">ID</label>
+            <input
+              type="text"
+              id="id"
+              formControlName="id"
+              [class.error]="isFieldInvalid('id')"
+              (blur)="onIdBlur()"
+            />
+            @if (isValidatingId()) {
+              <span class="validating-message">Validando...</span>
+            }
+            @if (isFieldInvalid('id')) {
+              <span class="error-message">{{ getFieldError('id') }}</span>
+            }
+          </div>
+
+          <!-- Nombre -->
+          <div class="form-group">
+            <label for="name">Nombre</label>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              [class.error]="isFieldInvalid('name')"
+            />
+            @if (isFieldInvalid('name')) {
+              <span class="error-message">{{ getFieldError('name') }}</span>
+            }
+          </div>
+
+          <!-- Descripción -->
+          <div class="form-group">
+            <label for="description">Descripción</label>
+            <input
+              type="text"
+              id="description"
+              formControlName="description"
+              [class.error]="isFieldInvalid('description')"
+            />
+            @if (isFieldInvalid('description')) {
+              <span class="error-message">{{ getFieldError('description') }}</span>
+            }
+          </div>
+
+          <!-- Logo -->
+          <div class="form-group">
+            <label for="logo">Logo</label>
+            <input
+              type="text"
+              id="logo"
+              formControlName="logo"
+              [class.error]="isFieldInvalid('logo')"
+            />
+            @if (isFieldInvalid('logo')) {
+              <span class="error-message">{{ getFieldError('logo') }}</span>
+            }
+          </div>
+
+          <!-- Fecha Liberación -->
+          <div class="form-group">
+            <label for="date_release">Fecha Liberación</label>
+            <input
+              type="date"
+              id="date_release"
+              formControlName="date_release"
+              [class.error]="isFieldInvalid('date_release')"
+            />
+            @if (isFieldInvalid('date_release')) {
+              <span class="error-message">{{ getFieldError('date_release') }}</span>
+            }
+          </div>
+
+          <!-- Fecha Revisión (readonly, auto-calculada) -->
+          <div class="form-group">
+            <label for="date_revision">Fecha Revisión</label>
+            <input
+              type="date"
+              id="date_revision"
+              formControlName="date_revision"
+              class="readonly"
+            />
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="goBack()">
+            Volver
+          </button>
+          <div class="form-actions-right">
+            <button type="button" class="btn btn-secondary" (click)="onReset()">
+              Reiniciar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSubmitting()">
+              {{ isSubmitting() ? 'Enviando...' : 'Enviar' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    }
+  </div>
+</div>

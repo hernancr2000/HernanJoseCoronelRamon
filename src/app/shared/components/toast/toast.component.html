@@ -1,0 +1,6 @@
+@if (notificationService.notification(); as notification) {
+  <div class="toast" [class]="notification.type">
+    <span>{{ notification.message }}</span>
+    <button class="toast-close" (click)="notificationService.clear()">×</button>
+  </div>
+}
