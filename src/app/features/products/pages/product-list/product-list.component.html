@@ -1,1 +1,126 @@
-<p>product-list works!</p>
+<div class="product-list-container">
+  <!-- Toolbar: Search + Add Button -->
+  <div class="toolbar">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search..."
+      [value]="searchTerm()"
+      (input)="onSearch($event)"
+    />
+    <button class="btn-add" (click)="navigateToCreate()">
+      Agregar
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="error-message">
+      {{ error() }}
+      <button class="btn-retry" (click)="loadProducts()">Reintentar</button>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="skeleton-table">
+        @for (item of [1, 2, 3, 4, 5]; track item) {
+          <div class="skeleton-row">
+            <div class="skeleton-cell skeleton-logo"></div>
+            <div class="skeleton-cell"></div>
+            <div class="skeleton-cell"></div>
+            <div class="skeleton-cell"></div>
+            <div class="skeleton-cell"></div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Products Table -->
+  @if (!isLoading() && !error()) {
+    <div class="table-container">
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th>Logo</th>
+            <th>Nombre del producto</th>
+            <th>
+              Descripción
+              <span class="info-icon" title="Descripción del producto">ⓘ</span>
+            </th>
+            <th>
+              Fecha de liberación
+              <span class="info-icon" title="Fecha de liberación del producto">ⓘ</span>
+            </th>
+            <th>
+              Fecha de reestructuración
+              <span class="info-icon" title="Fecha de revisión del producto">ⓘ</span>
+            </th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of paginatedProducts(); track product.id) {
+            <tr>
+              <td>
+                <div class="product-logo">
+                  @if (product.logo) {
+                    <img
+                      [src]="product.logo"
+                      [alt]="product.name"
+                      (error)="$event.target.style.display='none'"
+                    />
+                  }
+                  <span class="logo-fallback">
+                    {{ product.name.substring(0, 2).toUpperCase() }}
+                  </span>
+                </div>
+              </td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.description }}</td>
+              <td>{{ formatDate(product.date_release) }}</td>
+              <td>{{ formatDate(product.date_revision) }}</td>
+              <td class="actions-cell">
+                <button
+                  class="btn-menu"
+                  (click)="toggleMenu(product.id)"
+                  [class.active]="openMenuId() === product.id"
+                >
+                  ⋮
+                </button>
+                @if (openMenuId() === product.id) {
+                  <div class="dropdown-menu">
+                    <button (click)="navigateToEdit(product.id)">Editar</button>
+                    <button (click)="onDelete(product)">Eliminar</button>
+                  </div>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                No se encontraron productos
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer: Results count + Page size selector -->
+    <div class="table-footer">
+      <span class="results-count">{{ resultsCount() }} Resultados</span>
+      <select
+        class="page-size-select"
+        [value]="pageSize()"
+        (change)="onPageSizeChange($event)"
+      >
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+      </select>
+    </div>
+  }
+</div>

@@ -1,8 +1,21 @@
 import { Routes } from '@angular/router';
-import { ProductListComponent } from './features/products/pages/product-list/product-list.component';
 
 export const routes: Routes = [
-  { path: '', component: ProductListComponent },
+  {
+    path: '',
+    loadComponent: () => import('./features/products/pages/product-list/product-list.component')
+      .then(m => m.ProductListComponent)
+  },
+  // {
+  //   path: 'product/new',
+  //   loadComponent: () => import('./features/products/pages/product-form/product-form.component')
+  //     .then(m => m.ProductFormComponent)
+  // },
+  // {
+  //   path: 'product/edit/:id',
+  //   loadComponent: () => import('./features/products/pages/product-form/product-form.component')
+  //     .then(m => m.ProductFormComponent)
+  // },
   { path: '**', redirectTo: '' }
 ];
 
