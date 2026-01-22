@@ -140,3 +140,13 @@
     </div>
   }
 </div>
+
+<!-- Modal de confirmación para eliminar -->
+@if (showDeleteModal()) {
+  <app-confirm-modal
+    [message]="deleteModalMessage()"
+    [isLoading]="isDeleting()"
+    (confirm)="confirmDelete()"
+    (cancel)="closeDeleteModal()"
+  />
+}

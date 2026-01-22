@@ -4,17 +4,20 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductService } from '@core/services/product.service';
 import { Product } from '@core/models/product.model';
+import { ConfirmModalComponent } from '@shared/components/confirm-modal/confirm-modal.component';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmModalComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.css',
 })
 export class ProductListComponent implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
 
   // Estado
   products = signal<Product[]>([]);
@@ -26,6 +29,11 @@ export class ProductListComponent implements OnInit {
 
   // Menú contextual
   openMenuId = signal<string | null>(null);
+
+  // Modal de confirmación
+  showDeleteModal = signal<boolean>(false);
+  productToDelete = signal<Product | null>(null);
+  isDeleting = signal<boolean>(false);
 
   // Computed: productos filtrados por búsqueda
   filteredProducts = computed(() => {
@@ -61,6 +69,14 @@ export class ProductListComponent implements OnInit {
 
   // Computed: ¿puede ir a página siguiente?
   canGoNext = computed(() => this.currentPage() < this.totalPages());
+
+  // Computed: mensaje del modal
+  deleteModalMessage = computed(() => {
+    const product = this.productToDelete();
+    return product
+      ? `¿Estás seguro de eliminar el producto ${product.name}?`
+      : '';
+  });
 
   ngOnInit(): void {
     this.loadProducts();
@@ -135,9 +151,42 @@ export class ProductListComponent implements OnInit {
   }
 
   onDelete(product: Product): void {
-    // Por ahora solo cerramos el menú, luego implementaremos el modal
-    console.log('Delete product:', product.id);
+    this.productToDelete.set(product);
+    this.showDeleteModal.set(true);
     this.closeMenu();
+  }
+
+  // Confirmar eliminación
+  confirmDelete(): void {
+    const product = this.productToDelete();
+    if (!product) return;
+
+    this.isDeleting.set(true);
+
+    this.productService.deleteProduct(product.id).subscribe({
+      next: () => {
+        this.notificationService.show('Producto eliminado exitosamente', 'success');
+        this.closeDeleteModal();
+        this.loadProducts();
+
+        // Ajustar página si es necesario
+        if (this.paginatedProducts().length === 1 && this.currentPage() > 1) {
+          this.currentPage.update(p => p - 1);
+        }
+      },
+      error: (err) => {
+        console.error('Error deleting product:', err);
+        this.notificationService.show('Error al eliminar el producto', 'error');
+        this.isDeleting.set(false);
+      }
+    });
+  }
+
+  // Cerrar modal
+  closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+    this.productToDelete.set(null);
+    this.isDeleting.set(false);
   }
 
   formatDate(dateString: string): string {
