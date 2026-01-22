@@ -47,7 +47,7 @@ export class ProductFormComponent implements OnInit {
 
     this.productForm = this.fb.group({
       id: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10)]],
-      name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      name: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
       logo: ['', [Validators.required]],
       date_release: ['', [Validators.required, this.dateMinTodayValidator()]],

@@ -46,14 +46,14 @@
           </div>
 
           <!-- Descripción -->
-          <div class="form-group">
+          <div class="form-group form-group-full">
             <label for="description">Descripción</label>
-            <input
-              type="text"
+            <textarea
               id="description"
               formControlName="description"
               [class.error]="isFieldInvalid('description')"
-            />
+              rows="2"
+            ></textarea>
             @if (isFieldInvalid('description')) {
               <span class="error-message">{{ getFieldError('description') }}</span>
             }
@@ -62,12 +62,12 @@
           <!-- Logo -->
           <div class="form-group">
             <label for="logo">Logo</label>
-            <input
-              type="text"
+            <textarea
               id="logo"
               formControlName="logo"
               [class.error]="isFieldInvalid('logo')"
-            />
+              rows="2"
+            ></textarea>
             @if (isFieldInvalid('logo')) {
               <span class="error-message">{{ getFieldError('logo') }}</span>
             }
@@ -101,13 +101,9 @@
 
         <!-- Botones -->
         <div class="form-actions">
-          <button type="button" class="btn btn-outline" (click)="goBack()">
-            Volver
-          </button>
+          <button type="button" class="btn btn-outline" (click)="goBack()">Volver</button>
           <div class="form-actions-right">
-            <button type="button" class="btn btn-secondary" (click)="onReset()">
-              Reiniciar
-            </button>
+            <button type="button" class="btn btn-secondary" (click)="onReset()">Reiniciar</button>
             <button type="submit" class="btn btn-primary" [disabled]="isSubmitting()">
               {{ isSubmitting() ? 'Enviando...' : 'Enviar' }}
             </button>

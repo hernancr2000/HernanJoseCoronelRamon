@@ -53,9 +53,7 @@ export class ProductListComponent implements OnInit {
   totalResults = computed(() => this.filteredProducts().length);
 
   // Computed: total de páginas
-  totalPages = computed(() =>
-    Math.ceil(this.filteredProducts().length / this.pageSize())
-  );
+  totalPages = computed(() => Math.ceil(this.filteredProducts().length / this.pageSize()));
 
   // Computed: productos paginados
   paginatedProducts = computed(() => {
@@ -73,9 +71,7 @@ export class ProductListComponent implements OnInit {
   // Computed: mensaje del modal
   deleteModalMessage = computed(() => {
     const product = this.productToDelete();
-    return product
-      ? `¿Estás seguro de eliminar el producto ${product.name}?`
-      : '';
+    return product ? `¿Estás seguro de eliminar el producto ${product.name}?` : '';
   });
 
   ngOnInit(): void {
@@ -119,13 +115,13 @@ export class ProductListComponent implements OnInit {
 
   previousPage(): void {
     if (this.canGoPrevious()) {
-      this.currentPage.update(p => p - 1);
+      this.currentPage.update((p) => p - 1);
     }
   }
 
   nextPage(): void {
     if (this.canGoNext()) {
-      this.currentPage.update(p => p + 1);
+      this.currentPage.update((p) => p + 1);
     }
   }
 
@@ -171,14 +167,14 @@ export class ProductListComponent implements OnInit {
 
         // Ajustar página si es necesario
         if (this.paginatedProducts().length === 1 && this.currentPage() > 1) {
-          this.currentPage.update(p => p - 1);
+          this.currentPage.update((p) => p - 1);
         }
       },
       error: (err) => {
         console.error('Error deleting product:', err);
         this.notificationService.show('Error al eliminar el producto', 'error');
         this.isDeleting.set(false);
-      }
+      },
     });
   }
 
@@ -190,7 +186,9 @@ export class ProductListComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
